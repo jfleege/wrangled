@@ -11,6 +11,17 @@ library(bslib) # modern UI stuff for shiny
 library(DT) # for the data table output
 
 
+# -----------data sets to test------------
+
+
+# CSV: https://uofi.box.com/shared/static/2nk4zg0jbanfr6vz5jmjli9hsdp61agj.csv 
+
+#
+
+#
+
+
+
 # ---------------helpers------------------
 
 
@@ -42,9 +53,19 @@ guess_delim <- function(file) {
 ui <- page_sidebar(
   
   
+  # code to adjust theme
+  theme = bs_theme(bootswatch = "cosmo"),
+  
+  
   # sidebar code
   sidebar = sidebar(
     position = "left",
+    width = 300,
+    
+    
+    # little help blurb to guide users to avoid as little errors as possible
+    helpText("Paste your direct dataset link below. Make sure there are no extra spaces before or after the URL."),
+    
     
     # select STRUCTURED data set option that we learned in class
     # this means either the delim can either be one of:
@@ -57,11 +78,11 @@ ui <- page_sidebar(
     ),
     
     
-    # if they know the type of delimeter, let them pick
+    # if they know the type of delimiter, let them pick
     # if not, use the built in helper function
     selectInput(
       "delimiter",
-      "Delimiter:",
+      tags$h5(style = "font-weight:700;", "Delimiter:"),
       choices = c(
         "Auto-detect" = "auto",
         "Comma (,)" = ",",
@@ -71,16 +92,14 @@ ui <- page_sidebar(
         "Space" = " "
       ),
       selected = "auto"
-    ),
-    
-    
-    # main display
-    card(
-      card_header("Data Preview"),
-      DTOutput("data_table")
     )
-    
-    
+  ),
+  
+  
+  # main display
+  card(
+    card_header("Data Preview"),
+    DTOutput("data_table")
   )
 )
 
@@ -94,13 +113,17 @@ server <- function(input, output) {
   # reads data from the provided URL, using the specified delimiter 
   # (or auto-detecting it if "Auto-detect" is selected).
   data <- reactive({
-    req(input$dataset_url)
+    req(input$dataset)
     
-    delim_guess <- guess_delim(input$dataset_url)
+    delim_used <- if (input$delimiter == "auto") {
+      guess_delim(input$dataset)
+    } else {
+      input$delimiter
+    }
     
     read_delim(
-      file = input$dataset_url,
-      delim = delim_guess,
+      file = input$dataset,
+      delim = delim_used,
       show_col_types = FALSE
     )
   })
@@ -108,7 +131,15 @@ server <- function(input, output) {
   
   # outputs the data table using the DT package,
   output$data_table <- renderDT({
-    datatable(data())
+    datatable(
+      data(),
+      filter = "top",
+      options = list(
+        pageLength = 10,
+        lengthMenu = c(5, 10, 25, 50, 100), # to adjust shown entries
+        scrollX = TRUE
+      )
+    )
   })
 }
 
