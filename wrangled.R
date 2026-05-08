@@ -175,9 +175,22 @@ ui <- page_fluid(
         "*NOTE — This app was made with the intention of being used to only 
         view data, not analyze it. While you can make basic edits to the data, 
         there are no built-in statistical analysis features.",
-        style = "font-weight: 700; color: #E95420; margin-bottom: 0px; font-style: italic;"
+        style = "font-weight: 700; color: #E95420; margin-bottom: 12px; font-style: italic;"
+      ),
+      
+      # link to my repo for my information
+      tags$p(
+        "For more information about this project and how to use it, 
+        visit my GitHub repository ",
+        tags$a(
+          "here.",
+          href = "https://github.com/jfleege/wrangled",
+          target = "_blank"
+        ),
+        style = "font-size: .9rem; margin-bottom: 0;"
       )
     ),
+    
     
     # upload / options section
     div(
