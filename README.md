@@ -1,7 +1,7 @@
 # <img src="https://cdn.pixabay.com/animation/2023/06/13/15/13/15-13-13-522_512.gif" width="50"> *wrangled*
 
 An *R* Shiny app that focuses on uploading, previewing, and visually exploring 
-structured datasets. This project was originally made for my Statistical Data Management class (STAT 440) at the University of Illinois Urbana-Champaign.
+structured datasets. This project was originally made for my Statistical Data Management (STAT 440) class at the University of Illinois Urbana-Champaign.
 
 ## About 
 Users can either upload a local file or paste a direct dataset link, then view the data in an interactive table. After loading a dataset, users then can view any missing values in their data, remove rows with null values, rename columns, reorder columns, and download the edited version of their dataset. This app is designed to be a simple, user-friendly tool for anyone looking to quickly explore and make basic edits to their structured datasets without needing to write any code themselves.
