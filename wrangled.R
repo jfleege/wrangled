@@ -18,8 +18,6 @@ library(DT) # for the data table output
 
 #
 
-#
-
 
 
 # ---------------helpers------------------
@@ -52,11 +50,42 @@ guess_delim <- function(file) {
 
 ui <- page_fluid(
   
-  title = "wrangled",
+  title = "wrangled", # create title
   
-  theme = bs_theme(bootswatch = "united"),
+  theme = bs_theme(bootswatch = "united"), # adjust theme
   
-  tags$style(HTML("
+
+  # this is where all the HTML and fancy nonsense 
+  # i created just for vibes goes
+  tags$style(HTML(" 
+  
+    :root,
+    [data-bs-theme='light'] {
+      --wrangled-page-bg: #F2F0EF;
+      --wrangled-inner-bg: #E6E6E6;
+      --wrangled-muted: #666;
+      --wrangled-inner-border: #555;
+      --wrangled-sub-border: #444;
+      --wrangled-card-bg: var(--bs-body-bg);
+    }
+
+    [data-bs-theme='dark'] {
+      --wrangled-page-bg: #181a1b;
+      --wrangled-inner-bg: #2b3035;
+      --wrangled-muted: var(--bs-secondary-color);
+      --wrangled-inner-border: var(--bs-border-color);
+      --wrangled-sub-border: var(--bs-border-color);
+      --wrangled-card-bg: #212529;
+    }
+  
+    body {
+      background-color: var(--wrangled-page-bg);
+    }
+    
+    .card {
+      background-color: var(--wrangled-card-bg);
+    }
+    
     .form-group,
     .shiny-input-container {
       width: 100% !important;
@@ -67,14 +96,15 @@ ui <- page_fluid(
     }
 
     .inner-card {
-      border: 1px solid #555;
+      background-color: var(--wrangled-inner-bg);
+      border: 1px solid var(--wrangled-inner-border);
       padding: 16px;
       border-radius: 8px;
       margin-bottom: 16px;
     }
     
     .sub-card {
-      border: 1px solid #444;
+      border: 1px solid var(--wrangled-sub-border);
       padding: 16px;
       border-radius: 8px;
       height: 100%;
@@ -90,21 +120,62 @@ ui <- page_fluid(
     } 
   ")),
   
+  
+  # first card display
   card(
     style = "padding: 16px;",
+    
     
     # title / bio section
     div(
       class = "inner-card",
       
-      tags$h1(
-        "'wrangled'",
-        style = "font-weight: 700; margin-bottom: 10px;"
+      div(
+        style = "display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;",
+        
+        # title portion
+        div(
+          tags$h1(
+            "'wrangled'",
+            style = "font-weight: 700; margin-bottom: 18px; font-style: italic"
+          ),
+          
+          # subtitle portion
+          tags$h3(
+            "a Statistical Data Management (STAT 440) final project by Jackson Fleege",
+            style = "font-weight: 700; margin-bottom: 20px;"
+          )
+        ),
+        
+        # this lets the night/day button work
+        input_dark_mode(
+          id = "dark_mode",
+          mode = "light"
+        )
       ),
       
+      
+      # bio/description for users
       tags$p(
-        "A Shiny app for uploading, previewing, and visually exploring structured datasets. Users can either upload a local file or paste a direct dataset link, then view the data in an interactive table.",
-        style = "font-size: 1.2rem; margin-bottom: 0;"
+        "A Shiny app for uploading, previewing, and visually exploring 
+        structured datasets. Users can either upload a local file or paste a 
+        direct dataset link, then view the data in an interactive table. Upon 
+        providing the given dataset, users then can view any missing values 
+        in their data, remove rows with null values, rename columns, reorder 
+        columns, and download the edited version of their dataset. This app is 
+        designed to be a simple, user-friendly tool for anyone looking to 
+        quickly explore and make basic edits to their structured datasets 
+        without needing to write any code themselves.",
+        style = "font-size: 1.2rem; margin-bottom: 18; color: var(--wrangled-muted);"
+      ),
+      
+      
+      # important note about the app
+      tags$h5(
+        "NOTE — This app was made with the intention of being used to only 
+        view data, not analyze it. While you can make basic edits to the data, 
+        there are no built-in statistical analysis features.",
+        style = "font-weight: 700; color: #E95420; margin-bottom: 0px; font-style: italic;"
       )
     ),
     
@@ -112,50 +183,84 @@ ui <- page_fluid(
     div(
       class = "inner-card",
       
+      # title for data input section
       tags$h3(
-        "Upload Link/Dataset",
+        "Upload Dataset File / Link",
         style = "font-weight: 700; margin-bottom: 12px;"
       ),
       
       
+      # column layout, first column for file/link input, second column 
+      # for delimiter options. can adjust sizes later if needed
       layout_columns(
         col_widths = c(8, 4),
         
         div(
           class = "sub-card",
           
-          tags$p(
-            "Upload a structured data file from your computer or paste a direct dataset link below. Only CSV, TSV, and TXT files are supported.",
-            style = "font-size: 1.2rem; color: #666; margin-bottom: 16px;"
+          tags$h4(
+            "Upload Dataset File:",
+            style = "font-weight:700; margin-bottom: 6px;"
           ),
           
+          tags$p(
+            "Upload a structured data file from your computer. Only CSV, TSV, and TXT files are supported.",
+            style = "font-size: .9rem; color: var(--wrangled-muted); margin-bottom: 12px;"
+          ),
+          
+          # this input allows users to upload a file from their computer
           fileInput(
             "dataset_file",
-            tags$h4(style = "font-weight:700;", "Upload Data Set File:"),
+            label = NULL,
             accept = c(".csv", ".tsv", ".txt"),
             width = "100%"
           ),
           
-          tags$p(
-            "Or if you prefer, paste your structured dataset link below. Make sure there are no extra spaces before or after the URL.",
-            style = "font-size: 1.2rem; color: #666; margin-top: 18px; margin-bottom: 8px;"
+          
+          tags$h4(
+            "Insert Dataset Link:",
+            style = "font-weight:700;"
           ),
           
+          tags$p(
+            "Or if you prefer, paste your structured dataset link below. 
+            Make sure there are no extra spaces before or after the URL.
+            Only CSV, TSV, and TXT files are supported.",
+            style = "font-size: .9rem; color: var(--wrangled-muted); margin-top: 0px; margin-bottom: 12px;"
+          ),
+          
+          # allows for text input of dataset URL, which can be used
+          # instead of file upload
           textInput(
             "dataset",
-            tags$h4(style = "font-weight:700;", "Insert Data Set Link Here:"),
+            label = NULL,
             value = "",
             placeholder = "https://example.com/data.csv",
             width = "100%"
           )
         ),
         
+        # this section allows users to select the delimiter type for their dataset,
+        # with an auto-detect option that uses the guess_delim function to try to
+        # determine the correct delimiter based on the first line of the file
         div(
           class = "sub-card",
           
+          tags$h4(
+            "Delimiter:",
+            style = "font-weight:700; margin-bottom: 6px;"
+          ),
+          
+          tags$p(
+            "If you know the delimiter type used in your dataset, select it 
+            below. If not, Auto-detect will attempt to guess the delimiter 
+            type for you.",
+            style = "font-size: 0.9rem; color: var(--wrangled-muted); margin-bottom: 12px;"
+          ),
+          
           selectInput(
             "delimiter",
-            tags$h4(style = "font-weight:700;", "Delimiter:"),
+            label = NULL,
             choices = c(
               "Auto-detect" = "auto",
               "Comma (,)" = ",",
@@ -164,12 +269,8 @@ ui <- page_fluid(
               "Tab" = "\t",
               "Space" = " "
             ),
+            selected = "auto",
             width = "100%"
-          ),
-          
-          tags$p(
-            "If you know the delimeter type used in your dataset, select it here above If not, 'Auto-detect' is selected by default, which will attempt to guess the delimeter type for you.",
-            style = "font-size: 1.2rem; color: #666; margin-top: 18px; margin-bottom: 8px;"
           )
         )
       )
@@ -184,18 +285,26 @@ ui <- page_fluid(
         style = "font-weight: 700; margin-bottom: 12px;"
       ),
       
-      tags$p(
-        "Preview the uploaded dataset below. You can also remove null rows, rename columns, reorder columns, and download the edited version.",
-        style = "font-size: 0.95rem; color: #666; margin-bottom: 16px;"
-      ),
       
       layout_columns(
         col_widths = c(4, 4, 4),
         
+        # this section shows a summary of missing values in the current dataset 
+        # and allows users to remove rows with null values
         div(
           class = "sub-card",
           
-          tags$h4("Missing Values"),
+          tags$h4(
+            "Missing Values",
+            style = "font-weight: 700; margin-bottom: 6px;"
+          ),
+          
+          tags$p(
+            "View a quick summary of missing values in the current dataset. 
+            Use the button below to remove rows and columns that contain at 
+            least one missing value.",
+            style = "font-size: .9rem; color: var(--wrangled-muted); margin-bottom: 12px;"
+          ),
           
           verbatimTextOutput("missing_summary"),
           
@@ -206,10 +315,23 @@ ui <- page_fluid(
           )
         ),
         
+        # this section allows users to rename columns in the displayed data, 
+        # with some error handling for blank names and duplicate names, 
+        # also updates the column choices for the reorder/remove columns section 
+        # to match the new columns after changes are applied
         div(
           class = "sub-card",
           
-          tags$h4("Rename Column"),
+          tags$h4(
+            "Rename Column",
+            style = "font-weight: 700; margin-bottom: 6px;"
+          ),
+          
+          tags$p(
+            "Choose a column from the dataset, enter a new name, and apply the 
+            change to the displayed version of the data.",
+            style = "font-size: .9rem; color: var(--wrangled-muted); margin-bottom: 12px;"
+          ),
           
           selectInput(
             "rename_old",
@@ -232,14 +354,23 @@ ui <- page_fluid(
           )
         ),
         
+        # this section allows users to select which columns to keep and in 
+        # what order, with unselected columns being removed from the 
+        # displayed data, also updates the column choices for the 
+        # rename column section to match the new columns after changes 
+        # are applied
         div(
           class = "sub-card",
           
-          tags$h4("Reorder / Remove Columns"),
+          tags$h4(
+            "Reorder / Remove Columns",
+            style = "font-weight: 700; margin-bottom: 6px;"
+          ),
           
           tags$p(
-            "Select the columns to keep. The order selected will become the new column order.",
-            style = "font-size: 0.9rem; color: #666; margin-bottom: 8px;"
+            "Select the columns to keep. The order selected will become the new 
+            column order, and unselected columns will be removed.",
+            style = "font-size: .9rem; color: var(--wrangled-muted); margin-bottom: 12px;"
           ),
           
           selectizeInput(
@@ -283,7 +414,11 @@ server <- function(input, output, session) {
   edited_data <- reactiveVal(NULL)
   
   
-  # reads data from either uploaded file or pasted URL
+  # reads data from either uploaded file or pasted URL and stores it as 
+  # raw_data, also uses the guess_delim function to automatically detect 
+  # the delimiter if the user selects "Auto-detect" in the UI, and reads the 
+  # data using the appropriate delimiter, with some error handling for missing 
+  # file or URL input and for unsupported file types
   raw_data <- reactive({
     
     file_path <- NULL
@@ -309,7 +444,9 @@ server <- function(input, output, session) {
   })
   
   
-  # when a new dataset is loaded, set edited_data equal to raw_data
+  # when a new dataset is loaded, set edited_data equal to raw_data and
+  # update the rename column choices and column keep order choices to match the
+  # columns of the new dataset
   observeEvent(raw_data(), {
     
     df <- raw_data()
@@ -331,7 +468,9 @@ server <- function(input, output, session) {
   })
   
   
-  # shows missing value summary
+  # shows missing value summary for the current edited dataset, including 
+  # total null values, rows with at least one null, and columns with 
+  # at least one null
   output$missing_summary <- renderPrint({
     req(edited_data())
     
@@ -343,7 +482,9 @@ server <- function(input, output, session) {
   })
   
   
-  # removes rows with null values
+  # removes rows with null values and updates the edited data, as well as 
+  # the rename column choices and column keep order choices to match the 
+  # new columns after changes are applied
   observeEvent(input$remove_nulls, {
     req(edited_data())
     
@@ -368,7 +509,8 @@ server <- function(input, output, session) {
   })
   
   
-  # renames selected column
+  # renames selected column to new name, with some error handling for 
+  # blank names and duplicate names
   observeEvent(input$rename_col, {
     req(edited_data())
     req(input$rename_old)
@@ -415,7 +557,9 @@ server <- function(input, output, session) {
   })
   
   
-  # reorders columns
+  # reorders columns based on user selection and removes unselected columns
+  # also updates the rename column choices and column keep order choices to 
+  # match the new columns after changes are applied
   observeEvent(input$apply_column_changes, {
     req(edited_data())
     req(input$column_keep_order)
@@ -454,6 +598,8 @@ server <- function(input, output, session) {
   
   
   # outputs the current edited table
+  # also lets users display the data in a nice interactive table with 
+  # filtering, pagination, and horizontal scrolling
   output$data_table <- renderDT({
     req(edited_data())
     
@@ -469,7 +615,7 @@ server <- function(input, output, session) {
   })
   
   
-  # downloads edited dataset
+  # downloads edited dataset, with users adjustments if applicable
   output$download_edited <- downloadHandler(
     filename = function() {
       "wrangled_edited_dataset.csv"
