@@ -1,6 +1,6 @@
 # <img src="https://cdn.pixabay.com/animation/2023/06/13/15/13/15-13-13-522_512.gif" width="50"> *wrangled*
 
-An ***R*** Shiny app that focuses on uploading, previewing, and visually exploring 
+An *R* Shiny app that focuses on uploading, previewing, and visually exploring 
 structured datasets. This project was originally made for my Statistical Data Management class (STAT 440) at the University of Illinois, Urbana Champaign.
 
 ## About 
