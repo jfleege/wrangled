@@ -172,7 +172,7 @@ ui <- page_fluid(
       
       # important note about the app
       tags$h5(
-        "NOTE — This app was made with the intention of being used to only 
+        "*NOTE — This app was made with the intention of being used to only 
         view data, not analyze it. While you can make basic edits to the data, 
         there are no built-in statistical analysis features.",
         style = "font-weight: 700; color: #E95420; margin-bottom: 0px; font-style: italic;"
