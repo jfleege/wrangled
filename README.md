@@ -53,7 +53,8 @@ Or, if you are already inside the project folder in RStudio, open `wrangled.R` a
 
 Once the app opens, users can either upload a local structured data file or paste a direct dataset link. The app supports .csv, .tsv, and .txt files, and users can select a delimiter manually or use the default Auto-detect option. <p align="center"> <img width="90%" alt="wrangled UI" src="https://github.com/user-attachments/assets/517e8706-4809-4147-8724-ff5b48db4ec9" /> </p> <p align="center"><em>Main file input dashboard demonstrating example file and delimeter options.</em></p>
 
-After loading a dataset, users can preview the data in an interactive table, filter columns, adjust the number of visible rows, remove rows with missing values, rename columns, reorder/remove columns, and download the edited dataset as a new file. <p align="center"> <img width="90%" alt="wrangled UI" src="https://github.com/user-attachments/assets/3f65abb6-7f19-4bac-b869-4de7e217c847" /> </p> <p align="center"><em>Detail view shown after uploading a file, depicting all the possible editing/manipulation options.</em></p>
+After loading a dataset, users can preview the data in an interactive summary table, filter columns, adjust the number of visible rows, remove rows with missing values, rename columns, reorder/remove columns, and download the edited dataset as a new file. <p align="center"> <img width="90%" alt="wrangled UI" src="https://github.com/user-attachments/assets/2ca2b35a-664c-43dd-8ea6-c4d50a0917a4" /> </p> <p align="center"><em>Detail view shown after uploading a file, depicting all the possible editing/manipulation options.</em></p>
+
 
 ## Limitations
 
