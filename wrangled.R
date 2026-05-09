@@ -117,7 +117,30 @@ ui <- page_fluid(
     .equal-height-row .sub-card {
       width: 100%;
       height: 100%;
-    } 
+    }
+    
+    
+    #shiny-notification-panel {
+     position: fixed;
+     top: 20px;
+     right: 30px;
+     left: auto;
+     width: 440px;
+     max-width: calc(100vw - 60px);
+     z-index: 9999;
+    }
+    
+    .shiny-notification {
+      font-size: 1.1rem;
+      padding: 16px 20px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .shiny-notification-error {
+      font-weight: 700;
+    }
+    
   ")),
   
   
@@ -284,6 +307,18 @@ ui <- page_fluid(
             ),
             selected = "auto",
             width = "100%"
+          ),
+          
+          br(),
+          
+          # allows the user to reset the app and upload a new dataset by reloading the page
+          # just in case they want to start fresh without having to manually clear out the file 
+          # input and text input fields, also can be used if they want to upload a new dataset 
+          # after already making edits to the current one
+          actionButton(
+            "reset_app",
+            "Reset App / Upload New Dataset",
+            class = "btn-warning"
           )
         )
       )
@@ -300,7 +335,30 @@ ui <- page_fluid(
       
       
       layout_columns(
-        col_widths = c(4, 4, 4),
+        col_widths = c(3, 3, 3, 3),
+        
+        
+        # this section shows a summary of the current dataset that the user provided
+        # includes number of rows, columns, variable types, missing values, and duplicate rows
+        # can be used to get a quick overview of the structure and quality of the dataset before making edits
+        # which i think could be helpful
+        div(
+          class = "sub-card",
+          
+          tags$h4(
+            "Summarize Dataset",
+            style = "font-weight: 700; margin-bottom: 6px;"
+          ),
+          
+          tags$p(
+            "View a quick structural summary of the current dataset, 
+            including rows, columns, variable types, missing values, and duplicate rows.",
+            style = "font-size: .9rem; color: var(--wrangled-muted); margin-bottom: 12px;"
+          ),
+          
+          verbatimTextOutput("dataset_summary")
+        ),
+        
         
         # this section shows a summary of missing values in the current dataset 
         # and allows users to remove rows with null values
@@ -324,7 +382,7 @@ ui <- page_fluid(
           actionButton(
             "remove_nulls",
             "Remove Rows with Null Values",
-            class = "btn-warning"
+            class = "btn-primary"
           )
         ),
         
@@ -423,6 +481,14 @@ ui <- page_fluid(
 
 server <- function(input, output, session) {
   
+  
+  # reloads the app when the reset button is clicked, allowing users to start 
+  # fresh with a new dataset without having to manually clear out the file and URL inputs
+  observeEvent(input$reset_app, {
+    session$reload()
+  })
+  
+  
   # stores the currently edited version of the data
   edited_data <- reactiveVal(NULL)
   
@@ -491,6 +557,25 @@ server <- function(input, output, session) {
       selected = names(df),
       server = TRUE
     )
+  })
+  
+  
+  # shows a summary of the current edited dataset, including number of rows, 
+  # columns, variable types, missing values, and duplicate rows. can be used to 
+  # get a quick overview of the structure and quality of the dataset before making edits
+  output$dataset_summary <- renderPrint({
+    req(edited_data())
+    
+    df <- edited_data()
+    
+    cat("Rows:", nrow(df), "\n")
+    cat("Columns:", ncol(df), "\n")
+    cat("Numeric columns:", sum(sapply(df, is.numeric)), "\n")
+    cat("Character columns:", sum(sapply(df, is.character)), "\n")
+    cat("Logical columns:", sum(sapply(df, is.logical)), "\n")
+    cat("Date columns:", sum(sapply(df, inherits, what = "Date")), "\n")
+    cat("Total missing values:", sum(is.na(df)), "\n")
+    cat("Duplicate rows:", sum(duplicated(df)), "\n")
   })
   
   
