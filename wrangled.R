@@ -166,7 +166,7 @@ ui <- page_fluid(
         designed to be a simple, user-friendly tool for anyone looking to 
         quickly explore and make basic edits to their structured datasets 
         without needing to write any code themselves.",
-        style = "font-size: 1.2rem; margin-bottom: 18; color: var(--wrangled-muted);"
+        style = "font-size: 1.2rem; margin-bottom: 18px; color: var(--wrangled-muted);"
       ),
       
       
@@ -314,7 +314,7 @@ ui <- page_fluid(
           
           tags$p(
             "View a quick summary of missing values in the current dataset. 
-            Use the button below to remove rows and columns that contain at 
+            Use the button below to remove rows that contain at 
             least one missing value.",
             style = "font-size: .9rem; color: var(--wrangled-muted); margin-bottom: 12px;"
           ),
@@ -443,16 +443,27 @@ server <- function(input, output, session) {
       file_path <- stringr::str_trim(input$dataset)
     }
     
-    delim_used <- if (input$delimiter == "auto") {
-      guess_delim(file_path)
-    } else {
-      input$delimiter
-    }
-    
-    read_delim(
-      file = file_path,
-      delim = delim_used,
-      show_col_types = FALSE
+    tryCatch(
+      {
+        delim_used <- if (input$delimiter == "auto") {
+          guess_delim(file_path)
+        } else {
+          input$delimiter
+        }
+        
+        read_delim(
+          file = file_path,
+          delim = delim_used,
+          show_col_types = FALSE
+        )
+      },
+      error = function(e) {
+        showNotification(
+          "The dataset could not be read. Please check the URL, file type, or delimiter.",
+          type = "error"
+        )
+        return(NULL)
+      }
     )
   })
   
@@ -463,6 +474,8 @@ server <- function(input, output, session) {
   observeEvent(raw_data(), {
     
     df <- raw_data()
+    req(df)
+    
     edited_data(df)
     
     updateSelectInput(
